@@ -15,7 +15,7 @@ dependencies = [
     "langgraph>=0.2.60",
     "pymupdf>=1.25.1",
     "chainlit>=1.1.202",
-    "rich>=13.9.4",
+    "websockets>=14.1",
 ]
 
 [dependency-groups]
