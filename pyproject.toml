@@ -1,0 +1,24 @@
+[project]
+name = "informed-consent"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "langchain-qdrant>=0.2.0",
+    "langchain>=0.3.13",
+    "langchain-community>=0.3.13",
+    "pydantic==2.10.1",
+    "qdrant-client>=1.12.2",
+    "tiktoken>=0.8.0",
+    "langchain-openai>=0.2.14",
+    "langgraph>=0.2.60",
+    "pymupdf>=1.25.1",
+    "chainlit>=1.1.202",
+    "rich>=13.9.4",
+]
+
+[dependency-groups]
+dev = [
+    "ipykernel>=6.29.5",
+]
