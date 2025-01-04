@@ -30,16 +30,22 @@ async def on_chat_start():
     doc = pymupdf.Document(file.path)
     toc = doc.get_toc()
     # Want to find the List Of Figures page because that is the last page I want to skip
+    # Default is 1 if I do not find better start location
+    start_page = 1
     for _, title, page in toc:
         if title == "List of Figures":
             print(f"{title} on page {page}")
             start_page = page + 1
 
+
     # get the last page I want included
+    # default is last page of document
+    end_page = len(doc)
     for _, title, page in toc:
         if ("References" in title) or ("Bibliography" in title):
             print(f"{title} on page {page}")
             end_page = page
+
 
     print(f"Extraction should start on page {start_page} and end on page {end_page}")
 

@@ -4,7 +4,7 @@
 appOLD.py
 Clinical_Trial_Project.pages
 testing.ipynb
-.chainlit/
-.files/
-__pycache__/
-documents/
+.chainlit
+.files
+__pycache__
+documents
