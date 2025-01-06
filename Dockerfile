@@ -12,7 +12,7 @@ ENV PATH="/root/.local/bin/:$PATH"
 
 # # Set te home directory and path
 ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH
+    PATH=/home/user/.local/bin:/root/.local/bin/:$PATH
            
 
 # ENV PATH=/root/.local/bin:$PATH
