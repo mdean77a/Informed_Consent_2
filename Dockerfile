@@ -23,7 +23,7 @@ WORKDIR $HOME/app
 
 
 # # Copy the app to the container
-COPY --chown=user . $HOME/app
+COPY --chown=root . $HOME/app
 
 RUN chmod +x entrypoint.sh
 # # Install the dependencies
