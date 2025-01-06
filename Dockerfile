@@ -5,17 +5,14 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends curl ca-certificates\
     && rm -rf /var/lib/apt/lists/*
 
-# RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 RUN sh /uv-installer.sh && rm /uv-installer.sh
-ENV PATH="/root/.local/bin/:$PATH"
+# ENV PATH="/root/.local/bin/:$PATH"
 
 # # Set te home directory and path
 ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:/root/.local/bin/:$PATH
+    PATH="/home/user/.local/bin:/root/.local/bin/:$PATH"
            
-
-# ENV PATH=/root/.local/bin:$PATH
 
 # # NEEDED FOR CHAINLIT IN HUGGING FACE SPACES
 ENV UVICORN_WS_PROTOCOL=websockets
@@ -28,9 +25,8 @@ COPY --chown=user . $HOME/app
 RUN chmod +x entrypoint.sh
 # # Install the dependencies
 RUN uv sync --frozen
-# # RUN uv sync
 
-# # Expose the port
+# # Expose the ports
 EXPOSE 7860 6333
 ENTRYPOINT ["./entrypoint.sh"]
 

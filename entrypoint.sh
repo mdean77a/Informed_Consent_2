@@ -10,10 +10,11 @@ echo "Starting Qdrant server..."
 #   sleep 1
 # done
 echo "Qdrant is ready!"
-echo PATH 
+
 # chmod +x /root/.local/bin/uv
 
 # Start Chainlit application using Uvicorn
 echo "Starting Chainlit application..."
+ls -al /root/.local/bin/
 uv run chainlit run app.py --host 0.0.0.0 --port 7860
 
