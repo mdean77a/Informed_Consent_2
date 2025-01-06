@@ -33,8 +33,8 @@ def getVectorstore(document, file_path):
     for doc in document:
         doc.metadata['document_title'] = file_path.split('/')[-1]
 
-    # client = QdrantClient(url=qdrant_url)
-    client = QdrantClient(":memory:")
+    client = QdrantClient( url=qdrant_url)
+    # client = QdrantClient(":memory:")
     # If the collection exists, then we need to check to see if our document is already
     # present, in which case we would not want to store it again.
     if client.collection_exists("protocol_collection"):
@@ -42,8 +42,8 @@ def getVectorstore(document, file_path):
         qdrant_vectorstore = QdrantVectorStore.from_existing_collection(
             embedding=embedding_model,
             collection_name="protocol_collection",
-            # url=qdrant_url
-            location = ":memory:"
+            url=qdrant_url
+            # location = ":memory:"
         )
         
         # Check for existing documents and only add new ones
@@ -83,6 +83,7 @@ def getVectorstore(document, file_path):
             documents=document,
             embedding=embedding_model,
             collection_name="protocol_collection",
-            location = ":memory:"
+            # location = ":memory:"
+            url=qdrant_url
         )
     return qdrant_vectorstore

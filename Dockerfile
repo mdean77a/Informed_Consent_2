@@ -1,34 +1,32 @@
-# Dockerfile for the Clinical Trial Project
-# December 31, 2024
-# Happy New Year!
+# Trying to put qdrant into same container as chainlit application
 
-# Get a distribution that has uv already installed
-FROM ghcr.io/astral-sh/uv:python3.13-bookworm-slim
+FROM qdrant/qdrant:latest 
+RUN apt-get update && apt-get install -y \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Add user - this is the user that will run the app
-# If you do not set user, the app will run as root (undesirable)
-RUN useradd -m -u 1000 user
-USER user
+RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
-# Set the home directory and path
+# # Set te home directory and path
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH        
 
-# NEEDED FOR CHAINLIT IN HUGGING FACE SPACES
+ENV PATH="/root/.local/bin:$PATH"
+
+# # NEEDED FOR CHAINLIT IN HUGGING FACE SPACES
 ENV UVICORN_WS_PROTOCOL=websockets
 
-# Set the working directory
+# # Set the working directory
 WORKDIR $HOME/app
 
-# Copy the app to the container
+# # Copy the app to the container
 COPY --chown=user . $HOME/app
-
-# Install the dependencies
+RUN chmod +x entrypoint.sh
+# # Install the dependencies
 RUN uv sync --frozen
-# RUN uv sync
+# # RUN uv sync
 
-# Expose the port
-EXPOSE 7860
+# # Expose the port
+EXPOSE 7860 6333
+ENTRYPOINT ["./entrypoint.sh"]
 
-# Run the app
-CMD ["uv", "run", "chainlit", "run", "app.py", "--host", "0.0.0.0", "--port", "7860"]

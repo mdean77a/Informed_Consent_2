@@ -9,12 +9,20 @@ import pymupdf
 import tiktoken
 from langchain_core.documents.base import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import getVectorstore
+from getVectorstore import getVectorstore
+from qdrant_client.http import models as rest
+from langchain.prompts import ChatPromptTemplate
+import prompts
+from prompts import rag_prompt_template
+from defaults import default_llm
+from operator import itemgetter
+from langchain.schema.output_parser import StrOutputParser
 
-# def tiktoken_len(text):
-#     tokens = tiktoken.encoding_for_model("gpt-4o").encode(
-#         text,
-#     )
-#     return len(tokens)
+
+
+
+
 
 @cl.on_chat_start
 async def on_chat_start():
@@ -93,3 +101,36 @@ async def on_chat_start():
     )
 
     await msg.send()
+
+
+    qdrant_vectorstore = getVectorstore(document, file.path)
+
+    document_titles = ["protocol.pdf", "consent.pdf"]
+
+    # protocol_retriever = qdrant_vectorstore.as_retriever()
+
+    # protocol_retriever = create_protocol_retriever(document_titles)
+    protocol_retriever = qdrant_vectorstore.as_retriever(
+        search_kwargs={
+            'filter': rest.Filter(
+                must=[
+                    rest.FieldCondition(
+                        key="metadata.document_title",
+                        match=rest.MatchAny(any=document_titles)
+                    )
+                ]
+            ),
+            'k':15,
+        }
+    )
+
+
+    # Create prompt
+    rag_prompt = ChatPromptTemplate.from_template(prompts.rag_prompt_template)
+
+    llm = default_llm
+
+    rag_chain = (
+        {"context": itemgetter("question") | protocol_retriever, "question": itemgetter("question")}
+        | rag_prompt | llm | StrOutputParser()
+    )
