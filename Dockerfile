@@ -15,7 +15,7 @@ ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH
            
 
-ENV PATH=/root/.local/bin:$PATH
+# ENV PATH=/root/.local/bin:$PATH
 
 # # NEEDED FOR CHAINLIT IN HUGGING FACE SPACES
 ENV UVICORN_WS_PROTOCOL=websockets
