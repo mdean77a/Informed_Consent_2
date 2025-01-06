@@ -9,9 +9,10 @@ RUN curl -LsSf https://astral.sh/uv/install.sh | sh
 
 # # Set te home directory and path
 ENV HOME=/home/user \
-    PATH=/home/user/.local/bin:$PATH        
+    PATH=/home/user/.local/bin:$PATH
+           
 
-ENV PATH="/root/.local/bin:$PATH"
+ENV PATH=/root/.local/bin:$PATH
 
 # # NEEDED FOR CHAINLIT IN HUGGING FACE SPACES
 ENV UVICORN_WS_PROTOCOL=websockets
