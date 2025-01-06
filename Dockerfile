@@ -25,7 +25,7 @@ WORKDIR $HOME/app
 # # Copy the app to the container
 COPY --chown=root . $HOME/app
 
-RUN chmod +x entrypoint.sh
+RUN chmod 777 entrypoint.sh
 # # Install the dependencies
 RUN uv sync --frozen
 
