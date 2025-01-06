@@ -10,7 +10,7 @@ echo "Starting Qdrant server..."
 #   sleep 1
 # done
 echo "Qdrant is ready!"
-
+echo $PATH 
 # chmod +x /root/.local/bin/uv
 
 # Start Chainlit application using Uvicorn
