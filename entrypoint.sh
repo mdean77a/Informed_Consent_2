@@ -2,7 +2,7 @@
 # Start Qdrant in the background
 echo "Starting Qdrant server..."
 /qdrant/qdrant  &
-mkdir -p /home/user/.local/bin
+sudo mkdir -p /home/user/.local/bin
 echo "Qdrant is ready!"
 
 curl -LsSf https://astral.sh/uv/install.sh | sh
