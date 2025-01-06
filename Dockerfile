@@ -2,10 +2,13 @@
 
 FROM qdrant/qdrant:latest 
 RUN apt-get update && apt-get install -y \
-    curl \
+    --no-install-recommends curl ca-certificates\
     && rm -rf /var/lib/apt/lists/*
 
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+# RUN curl -LsSf https://astral.sh/uv/install.sh | sh
+ADD https://astral.sh/uv/install.sh /uv-installer.sh
+RUN sh /uv-installer.sh && rm /uv-installer.sh
+ENV PATH="/root/.local/bin/:$PATH"
 
 # # Set te home directory and path
 ENV HOME=/home/user \
