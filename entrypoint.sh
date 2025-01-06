@@ -11,6 +11,7 @@ echo "Starting Qdrant server..."
 # done
 echo "Qdrant is ready!"
 
+chmod +x /root/.local/bin/uv
 
 # Start Chainlit application using Uvicorn
 echo "Starting Chainlit application..."
