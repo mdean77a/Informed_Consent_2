@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
 
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 RUN sh /uv-installer.sh && rm /uv-installer.sh
-# ENV PATH="/root/.local/bin/:$PATH"
 
 # # Set te home directory and path
 ENV HOME=/home/user \
