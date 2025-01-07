@@ -34,6 +34,7 @@ async def on_chat_start():
     ).send()
 
     file = files[0]
+    print(f"filename is {file.name}")
 
     doc = pymupdf.Document(file.path)
     toc = doc.get_toc()
@@ -61,12 +62,18 @@ async def on_chat_start():
     # need a rect that will exclude headers and footers
     rect = pymupdf.Rect(0.0, 100.0, 612.0, 650.0)
 
-    #create the final text
+    #capture the first 2 page
     extracted_text = ""
+
+
     for page in doc.pages():
-        if page.number in range(start_page-1, end_page):
+        if page.number in [0, 1, 2]:
+            extracted_text += page.get_text()
+        elif page.number in range(start_page-1, end_page):
             # print(page.get_text(clip=rect))
             extracted_text += page.get_text(clip=rect)
+
+
     msg = cl.Message(
         content=f"""Processing selected file: `{file.name}`...
         Extraction beginning on page {start_page} and ending on page {end_page}.
@@ -102,29 +109,29 @@ async def on_chat_start():
 
     await msg.send()
 
+    qdrant_vectorstore = getVectorstore(document, file.name)
 
-    qdrant_vectorstore = getVectorstore(document, file.path)
+    protocol_retriever = qdrant_vectorstore.as_retriever(search_kwargs={"k":15})
+    # document_titles = [file.name]
 
-    document_titles = ["protocol.pdf", "consent.pdf"]
 
-    # protocol_retriever = qdrant_vectorstore.as_retriever()
-
-    # protocol_retriever = create_protocol_retriever(document_titles)
     protocol_retriever = qdrant_vectorstore.as_retriever(
         search_kwargs={
             'filter': rest.Filter(
-                must=[
+                 must=[
                     rest.FieldCondition(
                         key="metadata.document_title",
-                        match=rest.MatchAny(any=document_titles)
+                         match=rest.MatchAny(any=[file.name])
                     )
                 ]
             ),
-            'k':15,
+            'k': 15,                                       
         }
     )
+    # # protocol_retriever = qdrant_vectorstore.as_retriever()
 
-
+    # protocol_retriever = create_protocol_retriever(document_titles)
+ 
     # Create prompt
     rag_prompt = ChatPromptTemplate.from_template(prompts.rag_prompt_template)
 
@@ -134,3 +141,23 @@ async def on_chat_start():
         {"context": itemgetter("question") | protocol_retriever, "question": itemgetter("question")}
         | rag_prompt | llm | StrOutputParser()
     )
+
+    from datetime import date
+    # Heading for top of ICF document
+    protocol_title = rag_chain.invoke({"question": "What is the exact title of this protocol?  Only return the title itself without any other description."})
+    principal_investigator = rag_chain.invoke({"question":"What is the name of the principal investigator of the study?  Only return the name itself without any other description."})
+    support = rag_chain.invoke({"question":"What agency is funding the study?  Only return the name of the agency without any other description."})
+    version_date = date.today().strftime("%B %d, %Y")
+
+    msg = cl.Message(
+        content=f""" 
+        **Study Title:** {protocol_title}
+        **Principal Investigator:** {principal_investigator}
+        **Version Date:** {version_date}
+        **Source of Support:** {support}
+        ---
+        """
+    )
+
+    await msg.send()
+    

@@ -19,29 +19,36 @@ This could also be useful if different versions of documents are in existence.  
 recreate a large vectorstore.  But the user could select the most recent version.
 """
 
-
 def get_document_hash(doc_content):
     """Generate a unique hash for the document content."""
     return hashlib.md5(doc_content.encode()).hexdigest()
 
-def getVectorstore(document, file_path):
+def getVectorstore(document, file_name):
     # Add a unique hash to your documents
     for doc in document:
         doc.metadata['content_hash'] = get_document_hash(doc.page_content)
 
     # Add the document title
     for doc in document:
-        doc.metadata['document_title'] = file_path.split('/')[-1]
+        doc.metadata['document_title'] = file_name
 
+    # Add page to metadata
+    for i, doc in enumerate(document):
+        doc.metadata['source'] = f"source_{i}"
+
+    # collection_name = f"pdf_to_parse_{uuid.uuid4()}"
+    collection_name = "protocol_collection"
+    
     client = QdrantClient( url=qdrant_url)
-    # client = QdrantClient(":memory:")
+
+
     # If the collection exists, then we need to check to see if our document is already
     # present, in which case we would not want to store it again.
-    if client.collection_exists("protocol_collection"):
+    if client.collection_exists(collection_name):
         print("Collection exists")
         qdrant_vectorstore = QdrantVectorStore.from_existing_collection(
             embedding=embedding_model,
-            collection_name="protocol_collection",
+            collection_name=collection_name,
             url=qdrant_url
             # location = ":memory:"
         )
@@ -61,7 +68,7 @@ def getVectorstore(document, file_path):
         )
         
         scroll_results = client.scroll(
-            collection_name="protocol_collection",
+            collection_name=collection_name,
             scroll_filter=scroll_filter,
             limit=len(document)  # Adjust this if you have a large number of documents
         )
@@ -82,7 +89,7 @@ def getVectorstore(document, file_path):
         qdrant_vectorstore = QdrantVectorStore.from_documents(
             documents=document,
             embedding=embedding_model,
-            collection_name="protocol_collection",
+            collection_name=collection_name,
             # location = ":memory:"
             url=qdrant_url
         )
