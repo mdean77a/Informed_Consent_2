@@ -67,7 +67,7 @@ async def on_chat_start():
 
 
     for page in doc.pages():
-        if page.number in [0, 1, 2]:
+        if (start_page != 1 and page.number in [0, 1, 2]):
             extracted_text += page.get_text()
         elif page.number in range(start_page-1, end_page):
             # print(page.get_text(clip=rect))
