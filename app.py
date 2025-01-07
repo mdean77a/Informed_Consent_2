@@ -23,7 +23,6 @@ from langchain.schema.output_parser import StrOutputParser
 
 
 
-
 @cl.on_chat_start
 async def on_chat_start():
     files = await cl.AskFileMessage(
