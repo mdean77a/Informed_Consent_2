@@ -1,4 +1,6 @@
 #!/bin/bash
+echo "Current directory: $(pwd)"
+echo "Current path: $PATH"
 # Start Qdrant in the background
 echo "Starting Qdrant server..."
 /qdrant/qdrant  &
