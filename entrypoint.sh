@@ -18,8 +18,8 @@ else
 fi
 
 
-
-directory="../root/.local/bin"
+directory = "/"
+# directory="../root/.local/bin"
 if [ -d "$directory" ];
 then
     echo "Directory exists: $directory"
