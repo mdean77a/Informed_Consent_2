@@ -18,7 +18,7 @@ from prompts import rag_prompt_template
 from defaults import default_llm
 from operator import itemgetter
 from langchain.schema.output_parser import StrOutputParser
-
+from datetime import date
 
 
 
@@ -93,9 +93,7 @@ async def on_chat_start():
     )
 
     text_chunks = text_splitter.split_text(extracted_text)
-    # print(f"Number of chunks: {len(text_chunks)} ")
     document = [Document(page_content=chunk) for chunk in text_chunks]
-    # print(f"Length of  document: {len(document)}")
 
     msg = cl.Message(
         content=f"""Splitting the text with a recursive character splitter.
@@ -110,10 +108,10 @@ async def on_chat_start():
 
     qdrant_vectorstore = getVectorstore(document, file.name)
 
-    protocol_retriever = qdrant_vectorstore.as_retriever(search_kwargs={"k":15})
-    # document_titles = [file.name]
-
-
+    # My vectorstore may have multiple protocols or documents that have been stored and persisted.
+    # But I only want the context of the current session to relate to a document that I just processed
+    # so I need to pass in the title of the document.  This will act as a filter for the retrieved
+    # chunks.
     protocol_retriever = qdrant_vectorstore.as_retriever(
         search_kwargs={
             'filter': rest.Filter(
@@ -127,9 +125,6 @@ async def on_chat_start():
             'k': 15,                                       
         }
     )
-    # # protocol_retriever = qdrant_vectorstore.as_retriever()
-
-    # protocol_retriever = create_protocol_retriever(document_titles)
  
     # Create prompt
     rag_prompt = ChatPromptTemplate.from_template(prompts.rag_prompt_template)
@@ -160,3 +155,26 @@ async def on_chat_start():
 
     await msg.send()
     
+    # Now let's test the application to make a consent document
+    start_time = time.time()
+    # Brute force method that just saves each generated section as string
+    summary = rag_chain.invoke({"question":summary_query()})
+    background = rag_chain.invoke({"question":background_query()})
+    number_of_participants = rag_chain.invoke({"question":number_of_participants_query()})
+    study_procedures = rag_chain.invoke({"question":study_procedures_query()})
+    alt_procedures = rag_chain.invoke({"question":alt_procedures_query()})
+    risks = rag_chain.invoke({"question":risks_query()})
+    benefits = rag_chain.invoke({"question":benefits_query()})
+
+    end_time = time.time()
+    execution_time = end_time - start_time
+
+    msg = cl.Message(
+        content=f"""
+        Brute force (sequential) execution time: {execution_time:.2f} seconds.
+        {summary}
+        """
+
+    )
+   
+   await msg.send() 
