@@ -1,6 +1,6 @@
 import os
 from dotenv import load_dotenv
-
+import time
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
 
@@ -19,7 +19,13 @@ from defaults import default_llm
 from operator import itemgetter
 from langchain.schema.output_parser import StrOutputParser
 from datetime import date
-
+from queries import summary_query
+from queries import background_query
+from queries import number_of_participants_query
+from queries import study_procedures_query
+from queries import alt_procedures_query
+from queries import risks_query
+from queries import benefits_query
 
 
 
@@ -173,8 +179,14 @@ async def on_chat_start():
         content=f"""
         Brute force (sequential) execution time: {execution_time:.2f} seconds.
         {summary}
+        {background}  
+        {number_of_participants} 
+        {study_procedures}
+        {alt_procedures}
+        {risks}
+        {benefits}
         """
 
     )
    
-   await msg.send() 
+    await msg.send() 
