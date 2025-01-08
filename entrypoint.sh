@@ -5,7 +5,7 @@ echo "Current path: $PATH"
 
 
 # Specify the starting directory (e.g., root or home)
-start_directory="/"
+start_directory="../"
 
 # Use find to locate 'uv'
 found=$(find "$start_directory" -name "uv" 2>/dev/null)
