@@ -2,6 +2,23 @@
 echo "Current directory: $(pwd)"
 echo "Current path: $PATH"
 
+
+
+# Specify the starting directory (e.g., root or home)
+start_directory="/"
+
+# Use find to locate 'uv'
+found=$(find "$start_directory" -name "uv" 2>/dev/null)
+
+if [ -n "$found" ]; then
+    echo "'uv' found at:"
+    echo "$found"
+else
+    echo "'uv' not found in $start_directory or its subdirectories"
+fi
+
+
+
 directory="../root/.local/bin"
 if [ -d "$directory" ];
 then
