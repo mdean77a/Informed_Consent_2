@@ -89,7 +89,7 @@ async def on_chat_start():
     )
     await msg.send()
 
-    chunk_size = 2000
+    chunk_size = 3000
     chunk_overlap = 200
 
     text_splitter = RecursiveCharacterTextSplitter(
@@ -161,32 +161,88 @@ async def on_chat_start():
 
     await msg.send()
     
-    # Now let's test the application to make a consent document
-    start_time = time.time()
-    # Brute force method that just saves each generated section as string
-    summary = rag_chain.invoke({"question":summary_query()})
-    background = rag_chain.invoke({"question":background_query()})
-    number_of_participants = rag_chain.invoke({"question":number_of_participants_query()})
-    study_procedures = rag_chain.invoke({"question":study_procedures_query()})
-    alt_procedures = rag_chain.invoke({"question":alt_procedures_query()})
-    risks = rag_chain.invoke({"question":risks_query()})
-    benefits = rag_chain.invoke({"question":benefits_query()})
+        # Sending an action button within a chatbot message
+    actions = [
+        cl.Action(
+            name="summary_button",
+            icon="mouse-pointer-click",
+            payload={"value": "summary"},
+            label="Write summary"
+        ),
+        cl.Action(
+            name="risk_button",
+            icon="mouse-pointer-click",
+            payload={"value": "risks"},
+            label="Write risk section"
+        ),
+        cl.Action(
+            name="benefits_button",
+            icon="mouse-pointer-click",
+            payload={"value": "benefits"},
+            label="Write benefits section"
+        ),
+        cl.Action(
+            name="file_button",
+            icon="mouse-pointer-click",
+            payload={"value": "markdown"},
+            label="Create final file"
+        )
+    ]
+    await cl.Message(content="Select consent form sections:", actions=actions).send()
 
-    end_time = time.time()
-    execution_time = end_time - start_time
+    @cl.action_callback("summary_button")
+    async def on_action(action: cl.Action):
+        summary = rag_chain.invoke({"question":summary_query()})
+        await cl.Message(content=summary).send()
+        await cl.Message(content=f"Executed {action.payload["value"]}").send()
+        # await action.remove()
 
-    msg = cl.Message(
-        content=f"""
-        Brute force (sequential) execution time: {execution_time:.2f} seconds.
-        {summary}
-        {background}  
-        {number_of_participants} 
-        {study_procedures}
-        {alt_procedures}
-        {risks}
-        {benefits}
-        """
+    @cl.action_callback("risk_button")
+    async def on_action(action: cl.Action):
+        risks = rag_chain.invoke({"question":risks_query()})
+        await cl.Message(content=risks).send()
+        await cl.Message(content=f"Executed {action.payload["value"]}").send()
+        # await action.remove()
 
-    )
+    @cl.action_callback("benefits_button")
+    async def on_action(action: cl.Action):
+        benefits = rag_chain.invoke({"question":benefits_query()})
+        await cl.Message(content=benefits).send()
+        await cl.Message(content=f"Executed {action.payload["value"]}").send()
+        # await action.remove()
+
+    # @cl.action_callback("file_button")
+    # async def on_action(action: cl.Action):
+    #     await cl.Message(content=f"Executed {action.payload["value"]}").send()
+    #     await action.remove()
+
+
+    # # Now let's test the application to make a consent document
+    # start_time = time.time()
+    # # Brute force method that just saves each generated section as string
+    # summary = rag_chain.invoke({"question":summary_query()})
+    # background = rag_chain.invoke({"question":background_query()})
+    # number_of_participants = rag_chain.invoke({"question":number_of_participants_query()})
+    # study_procedures = rag_chain.invoke({"question":study_procedures_query()})
+    # alt_procedures = rag_chain.invoke({"question":alt_procedures_query()})
+    # risks = rag_chain.invoke({"question":risks_query()})
+    # benefits = rag_chain.invoke({"question":benefits_query()})
+
+    # end_time = time.time()
+    # execution_time = end_time - start_time
+
+    # msg = cl.Message(
+    #     content=f"""
+    #     Brute force (sequential) execution time: {execution_time:.2f} seconds.
+    #     {summary}
+    #     {background}  
+    #     {number_of_participants} 
+    #     {study_procedures}
+    #     {alt_procedures}
+    #     {risks}
+    #     {benefits}
+    #     """
+
+    # )
    
-    await msg.send() 
+    # await msg.send() 

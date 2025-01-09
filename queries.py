@@ -126,6 +126,8 @@ def risks_query():
 
     All the details of study risks should be specific to this protocol.
 
+    You must complete this task as it is a required part of the document.
+
     """
     return risks_query
 
