@@ -6,6 +6,7 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends curl ca-certificates\
     && rm -rf /var/lib/apt/lists/*
 
+# RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR="/custom/path" sh
 # Install uv - it installs in /root/.local/bin
 ADD https://astral.sh/uv/install.sh /uv-installer.sh
 RUN sh /uv-installer.sh && rm /uv-installer.sh
@@ -18,10 +19,11 @@ ENV HOME=/home/user \
 # # NEEDED FOR CHAINLIT IN HUGGING FACE SPACES
 ENV UVICORN_WS_PROTOCOL=websockets
 
+ENV QDRANT_ENABLE_DASHBOARD=true
 # Set the working directory
 WORKDIR $HOME/app
 
-
+RUN curl -LsSf https://astral.sh/uv/install.sh | env UV_INSTALL_DIR=$HOME/app sh
 # # Copy the app to the container
 COPY --chown=user . $HOME/app
 
