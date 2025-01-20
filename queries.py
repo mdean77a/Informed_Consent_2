@@ -108,28 +108,25 @@ def alt_procedures_query():
     """
     return alt_procedures_query
 
-def risks_query():
-    risks_query = """ 
-    Please write a detailed summary of the risks of participating in  the study.  This will be used for the
-    "Risks" section of the informed consent document.  It is important that all significant risks of study
-    participation are described in detail. The summary must be easily readable by untrained readers, so provide
-    definitions of technical or medical terms.  Address all the risks by speaking to the patient, not by passively
-    mentioning risks to "the patient".  Especially include risks that are associated with the study interventions such
-    as drugs or devices, or associated with testing that is done as part of the study.  Also include
-    the risks associated with data collection, and also mention "unforeseable risks".
+# def risks_query():
+risks_query = """ 
+Please write a summary of the risks of participating in  the study.  This will be used for the
+"Risks" section of the informed consent document.  It is important that all significant 
+risks of study participation that are described in the protocol are included. 
 
-    The length of this risk summary is usually
-    2000 to 3000 words.
+You only need to include risks that are described in the protocol. 
 
-    Start the summary with a level 2 Markdown header (##) titled "Risks", and then continue the section with subheadings
-    that will help organize the information for the reader.  Do not go more than two subheadings deep.
+The summary must be easily readable by untrained readers, so provide
+definitions of technical or medical terms.  Address all the risks by speaking to the patient, not by passively
+mentioning risks to "the patient".  
 
-    All the details of study risks should be specific to this protocol.
+The length of this risk summary is usually 2000 to 3000 words. 
 
-    You must complete this task as it is a required part of the document.
+Start the summary with a level 2 Markdown header (##) titled "Risks", and then continue the section with subheadings
+that will help organize the information for the reader.  Do not go more than two subheadings deep.
 
-    """
-    return risks_query
+"""
+    # return risks_query
 
 def benefits_query():
     benefits_query = """ 
@@ -138,7 +135,7 @@ def benefits_query():
     (addressed as "you"), and potential benefits for others.  Since this is a research study and it is
     not known if the intervention is helpful, it is important to not overstate potential benefits for the patient.
 
-    The length of this risk summary is usually
+    The length of this benefits summary is usually
     500 to 750 words.
 
     Start the summary with a level 2 Markdown header (##) titled "Benefits",  and then continue 

@@ -3,6 +3,7 @@ from dotenv import load_dotenv
 import time
 load_dotenv()
 OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# LANGCHAIN_API_KEY = os.getenv('LANGCHAIN_API_KEY')
 
 import chainlit as cl
 import pymupdf
@@ -27,7 +28,13 @@ from queries import alt_procedures_query
 from queries import risks_query
 from queries import benefits_query
 
+import os
+from uuid import uuid4
 
+# unique_id = uuid4().hex[0:8]
+
+# os.environ["LANGCHAIN_TRACING_V2"] = "true"
+# os.environ["LANGCHAIN_PROJECT"] = f"LangSmith - {unique_id}"
 
 @cl.on_chat_start
 async def on_chat_start():
@@ -35,7 +42,7 @@ async def on_chat_start():
         content="Upload a file to proceed",
         accept=["application/pdf"],
         max_size_mb=50,
-        timeout=180,
+        timeout=1800,
     ).send()
 
     file = files[0]
@@ -46,10 +53,10 @@ async def on_chat_start():
     # Want to find the List Of Figures page because that is the last page I want to skip
     # Default is 1 if I do not find better start location
     start_page = 1
-    for _, title, page in toc:
-        if title == "List of Figures":
-            print(f"{title} on page {page}")
-            start_page = page + 1
+    # for _, title, page in toc:
+    #     if title == "List of Figures":
+    #         print(f"{title} on page {page}")
+    #         start_page = page + 1
 
 
     # get the last page I want included
@@ -70,13 +77,17 @@ async def on_chat_start():
     #capture the first 2 page
     extracted_text = ""
 
-
     for page in doc.pages():
-        if (start_page != 1 and page.number in [0, 1, 2]):
-            extracted_text += page.get_text()
-        elif page.number in range(start_page-1, end_page):
-            # print(page.get_text(clip=rect))
+        if page.number in range(start_page-1, end_page):
             extracted_text += page.get_text(clip=rect)
+
+
+    # for page in doc.pages():
+    #     if (start_page != 1 and page.number in [0, 1, 2]):
+    #         extracted_text += page.get_text()
+    #     elif page.number in range(start_page-1, end_page):
+    #         # print(page.get_text(clip=rect))
+    #         extracted_text += page.get_text(clip=rect)
 
 
     msg = cl.Message(
@@ -89,8 +100,8 @@ async def on_chat_start():
     )
     await msg.send()
 
-    chunk_size = 3000
-    chunk_overlap = 200
+    chunk_size = 800
+    chunk_overlap = 400
 
     text_splitter = RecursiveCharacterTextSplitter(
         chunk_size=chunk_size,
@@ -128,7 +139,7 @@ async def on_chat_start():
                     )
                 ]
             ),
-            'k': 15,                                       
+            'k': 20,                                       
         }
     )
  
@@ -139,8 +150,10 @@ async def on_chat_start():
 
     rag_chain = (
         {"context": itemgetter("question") | protocol_retriever, "question": itemgetter("question")}
-        | rag_prompt | llm | StrOutputParser()
-    )
+        | rag_prompt 
+        | llm
+        | StrOutputParser()
+    ).with_config({"run_mode": "stream"})  # Enable streaming mode
 
     from datetime import date
     # Heading for top of ICF document
@@ -199,7 +212,9 @@ async def on_chat_start():
 
     @cl.action_callback("risk_button")
     async def on_action(action: cl.Action):
-        risks = rag_chain.invoke({"question":risks_query()})
+        # risks = rag_chain.invoke({"question":risks_query()})
+        risks = rag_chain.invoke({"question":risks_query})
+        # risks = rag_chain.invoke({"question":"Write a summary of the risks of participating in the study.  This will be used for the 'Risks' section of the informed consent document.  The summary should include potential risks for the patient (addressed as 'you'), and potential risks for others.  Since this is a research study and it is not known if the intervention is helpful, it is important to not overstate potential risks for the patient.  The length of this risks summary is usually 500 to 750 words.  Start the summary with a level 2 Markdown header (##) titled 'Risks', and then continue the section with subheadings that will help organize the information for the reader.  Do not go more than two subheadings deep."})
         await cl.Message(content=risks).send()
         await cl.Message(content=f"Executed {action.payload["value"]}").send()
         # await action.remove()

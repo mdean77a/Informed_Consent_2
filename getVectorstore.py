@@ -40,7 +40,7 @@ def getVectorstore(document, file_name):
     collection_name = "protocol_collection"
     
     client = QdrantClient( url=qdrant_url)
-
+    # client = QdrantClient(location=":memory:")  
 
     # If the collection exists, then we need to check to see if our document is already
     # present, in which case we would not want to store it again.
